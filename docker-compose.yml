@@ -1,4 +1,4 @@
-version: '3.8'
+# version: '3.8'
 services:
   app1:
     build: ./app
@@ -25,13 +25,25 @@ services:
     volumes:
       - ./HA_PROXY/ha_proxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
     ports:
-      - "8080:81"
-      - "1936:1936"
+      - "8080:80"      
+      - "1936:1936"    
     depends_on:
       - app1
       - app2
     networks:
       - monitoring
+  haproxy-exporter:
+    image: prom/haproxy-exporter
+    container_name: haproxy-exporter
+    command:
+      - "--haproxy.scrape-uri=http://haproxy:1936/stats;csv"
+    ports:
+      - "9101:9101"
+    depends_on:
+      - haproxy
+    networks:
+      - monitoring
+
 
   prometheus:
     image: prom/prometheus

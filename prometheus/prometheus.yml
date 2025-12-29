@@ -10,4 +10,4 @@ scrape_configs:
   - job_name: "haproxy"
     static_configs:
       - targets: 
-        - haproxy:9101
+        - haproxy-exporter:9101

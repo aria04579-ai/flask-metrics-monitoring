@@ -1,5 +1,10 @@
 from flask import Flask
-from prometheus_client import start_http_server, Counter, Gauge,generate_latest
+from prometheus_client import (
+    Counter,
+    Gauge,
+    generate_latest,
+    start_http_server,
+)
 import time
 from prometheus_client.exposition import basic_auth_handler
 

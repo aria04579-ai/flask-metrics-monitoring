@@ -1,0 +1,61 @@
+version: '3.8'
+services:
+  app1:
+    build: ./app
+    container_name: app1
+    expose:
+      - "5000"
+    ports:
+      - "5001:5000"
+    networks:
+      - monitoring
+  app2:
+    build: ./app
+    container_name: app2
+    expose:
+      - "5000"
+    ports:
+      - "5002:5000"
+    networks:
+      - monitoring
+
+  haproxy:
+    image: haproxy:2.7
+    container_name: haproxy
+    volumes:
+      - ./HA_PROXY/ha_proxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    ports:
+      - "8080:81"
+      - "1936:1936"
+    depends_on:
+      - app1
+      - app2
+    networks:
+      - monitoring
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    networks:
+      - monitoring
+    depends_on:
+      - app1
+      - app2
+      - haproxy
+  grafana:
+     image: grafana/grafana:latest
+     ports:
+       - "3000:3000"
+     environment:
+        - GF_SECURITY_ADMIN_PASSWORD=admin
+     networks:
+        - monitoring
+         
+    
+networks:
+  monitoring:
+    driver: bridge
